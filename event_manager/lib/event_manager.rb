@@ -1,6 +1,7 @@
 require 'csv'
 require 'sunlight/congress'
 require 'erb'
+require 'time'
 
 Sunlight::Congress.api_key = "e179a6973728c4dd3fb1204283aaccb5"
 
@@ -10,6 +11,25 @@ def clean_phone_number(phone_number)
     pn[-10..-1]
   else
     "no number"
+  end
+end
+
+def registration_hour(time)
+  DateTime.strptime(time, '%Y/%d/%m %H:%M').hour
+end
+
+def peak_registration_hours(hours)
+  Dir.mkdir("peak_registration_hours") unless Dir.exists?("peak_registration_hours")
+
+  File.open("peak_registration_hours/peak_hours.txt", "w") do |file|
+    h = {} # hash: hours => how many ragistrations at the time
+    hours.each_with_index do |item, index|
+      h[item] = h.has_key?(item) ? h[item] + 1 : 1
+    end
+
+    h.sort_by{|_,v| v}.reverse.each do |key, value|
+      file.puts "At #{key} o'clock there was #{value} registrations."
+    end
   end
 end
 
@@ -44,6 +64,10 @@ contents = CSV.open 'event_attendees.csv', headers: true, header_converters: :sy
 template_letter = File.read "form_letter.erb"
 erb_template = ERB.new template_letter
 
+hours = []
+
+File.open("phones/phones.txt", 'w') {} if Dir.exists?("phones") #cleaning a file if there exists
+
 contents.each do |row|
   id = row[0]
   name = row[:first_name]
@@ -55,4 +79,8 @@ contents.each do |row|
 
   homephone = clean_phone_number(row[:homephone])
   save_number_phones(name, homephone)
+
+  hours << registration_hour(row[:regdate])
 end
+
+peak_registration_hours(hours)
