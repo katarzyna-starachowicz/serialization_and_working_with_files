@@ -9,3 +9,9 @@ At 1 o'clock there was 1 registrations.
 At 17 o'clock there was 1 registrations.
 At 15 o'clock there was 1 registrations.
 At 10 o'clock there was 1 registrations.
+There was 7 registrations on Thursday.
+There was 5 registrations on Friday.
+There was 4 registrations on Monday.
+There was 1 registrations on Tuesday.
+There was 1 registrations on Sunday.
+There was 1 registrations on Wednesday.

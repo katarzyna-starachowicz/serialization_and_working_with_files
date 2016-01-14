@@ -14,14 +14,24 @@ def clean_phone_number(phone_number)
   end
 end
 
+def save_number_phones(name, homephone)
+  Dir.mkdir("phones") unless Dir.exists?("phones")
+
+  File.open("phones/phones.txt", 'a') { |file| file.puts "#{name}: #{homephone}" }
+end
+
 def registration_hour(time)
   DateTime.strptime(time, '%Y/%d/%m %H:%M').hour
 end
 
-def peak_registration_hours(hours)
-  Dir.mkdir("peak_registration_hours") unless Dir.exists?("peak_registration_hours")
+def registration_day(time)
+  DateTime.strptime(time, '%Y/%d/%m %H:%M').wday
+end
 
-  File.open("peak_registration_hours/peak_hours.txt", "w") do |file|
+def peak_registration_hours_and_days(hours, wdays)
+  Dir.mkdir("peak_registration") unless Dir.exists?("peak_registration")
+
+  File.open("peak_registration/peak_hours_and_days.txt", "w") do |file|
     h = {} # hash: hours => how many ragistrations at the time
     hours.each_with_index do |item, index|
       h[item] = h.has_key?(item) ? h[item] + 1 : 1
@@ -29,6 +39,19 @@ def peak_registration_hours(hours)
 
     h.sort_by{|_,v| v}.reverse.each do |key, value|
       file.puts "At #{key} o'clock there was #{value} registrations."
+    end
+
+    hd = {} # hash: wdays => how many ragistrations in the day
+    wdays.each_with_index do |item, index|
+      hd[item] = hd.has_key?(item) ? hd[item] + 1 : 1
+    end
+
+    digit_days = { 0 => "Monday", 1 => "Tuesday", 2 => "Wednesday", 
+      3 => "Thursday", 4 => "Friday", 5 => "Saturday", 6 => "Sunday"}
+
+    hd.sort_by{|_,v| v}.reverse.each do |key, value|
+      puts "#Key:#{key}, Value: #{value}"
+      file.puts "There was #{value} registrations on #{digit_days[key]}."
     end
   end
 end
@@ -51,12 +74,6 @@ def save_thank_you_letters(id,form_letter)
   end
 end
 
-def save_number_phones(name, homephone)
-  Dir.mkdir("phones") unless Dir.exists?("phones")
-
-  File.open("phones/phones.txt", 'a') { |file| file.puts "#{name}: #{homephone}" }
-end
-
 puts "EventManager initialized."
 
 contents = CSV.open 'event_attendees.csv', headers: true, header_converters: :symbol
@@ -65,6 +82,7 @@ template_letter = File.read "form_letter.erb"
 erb_template = ERB.new template_letter
 
 hours = []
+wdays = []
 
 File.open("phones/phones.txt", 'w') {} if Dir.exists?("phones") #cleaning a file if there exists
 
@@ -81,6 +99,7 @@ contents.each do |row|
   save_number_phones(name, homephone)
 
   hours << registration_hour(row[:regdate])
+  wdays << registration_day(row[:regdate])
 end
 
-peak_registration_hours(hours)
+peak_registration_hours_and_days(hours, wdays)
