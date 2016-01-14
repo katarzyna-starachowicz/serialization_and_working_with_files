@@ -6,10 +6,8 @@ Sunlight::Congress.api_key = "e179a6973728c4dd3fb1204283aaccb5"
 
 def clean_phone_number(phone_number)
   pn = phone_number.split("").select{|i| i =~ /\d/}.join("")
-  if pn.length == 10
-    pn
-  elsif pn.length == 11  && pn[0] == "1"
-    pn[1..10]
+  if (pn.length == 10) || (pn.length == 11  && pn[0] == "1")
+    pn[-10..-1]
   else
     "no number"
   end
