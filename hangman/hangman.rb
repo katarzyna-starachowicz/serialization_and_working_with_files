@@ -11,15 +11,16 @@ end
 class Game
   include Dictionary
 
-  attr_reader :secret_word
+  attr_reader :secret_word, :bad_choices
   
   def initialize
     @secret_word = random_word
     @turns = 12
+    @bad_choices = []
   end
 
   def welcome
-    puts "\n Welcome, User!"
+    puts "\nWelcome, User!"
     puts "What's Your name?"
     gets.strip
   end
@@ -46,14 +47,16 @@ class Game
       if @turns == 0
         "__  :-X ..::GAME OVER::.. X-:  __"
       else
-        puts "You have lost #{12 - @turns} turns, but You still have #{@turns} turns."
+        puts "You have lost #{12 - @turns} turns."
+        puts "But You still have #{@turns} more incorrect guesses before the game ends."
+        @bad_choices << letter
         underscore_word
       end
     end
   end
 
   def take_letter
-    puts "Guess a letter, please."
+    puts "\nGuess a letter, please."
     gets.strip.upcase
   end
 end
@@ -74,8 +77,8 @@ class Hangman
   end
 
   def lost
-    puts "I'm so sorry, #{@user_name}. You have lost all the turns."
-    puts "\nYou are a hangman now."
+    puts "\nI'm so sorry, #{@user_name}. You have lost all the turns."
+    puts "You are a hangman now."
     puts "Creepy, isn't it?".rjust(50)
     puts "\n\n"
   end
@@ -90,10 +93,10 @@ class Hangman
         break
       elsif @underscore_word == "__  :-X ..::GAME OVER::.. X-:  __"
         lost
-        puts "PS That was a secret word: #{@game.secret_word}".rjust(100)
+        puts "PS The secret word was: #{@game.secret_word}".rjust(100)
         break
       else
-        true
+        puts "Misses: #{@game.bad_choices.join(", ").downcase}"
       end
     end
   end
