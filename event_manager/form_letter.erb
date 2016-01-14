@@ -13,10 +13,11 @@
   </p>
 
   <table>
-  <tr><th>Name</th><th>Website</th></tr>
+  <tr><th>Name</th><th>Phone number</th><th>Website</th></tr>
     <% legislators.each do |legislator| %>
       <tr>
         <td><%= "#{legislator.first_name} #{legislator.last_name}" %></td>
+        <td><%= "#{legislator.phone_number}" %></td>
         <td><%= "#{legislator.website}" %></td>
       </tr>
     <% end %>
