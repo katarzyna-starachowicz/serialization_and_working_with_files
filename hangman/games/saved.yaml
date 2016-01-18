@@ -1,0 +1,10 @@
+--- !ruby/object:Hangman
+game: !ruby/object:Game
+  secret_word: ILLEGAL
+  turns: 9
+  bad_choices:
+  - Y
+  - U
+  - K
+user_name: kaska
+underscore_word: ILLE_AL

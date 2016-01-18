@@ -1,0 +1,6 @@
+--- !ruby/object:Game
+secret_word: AGREEMENT
+turns: 10
+bad_choices:
+- O
+- I

@@ -1,3 +1,5 @@
+require 'yaml'
+
 module Dictionary
   def random_word
   	dict = []
@@ -11,7 +13,7 @@ end
 class Game
   include Dictionary
 
-  attr_reader :secret_word, :bad_choices
+  attr_reader :secret_word, :bad_choices, :turns
   
   def initialize
     @secret_word = random_word
@@ -26,7 +28,7 @@ class Game
   end
 
   def underscore_word
-  	a = ""
+    a = ""
   	@secret_word.length.times {a << "_"}
   	a
   end
@@ -59,9 +61,17 @@ class Game
     puts "\nGuess a letter, please."
     gets.strip.upcase
   end
+
+  def load_game
+    game_file = GameFile.new("saved.yaml")
+    yaml = game_file.read
+    YAML::load(yaml)
+  end
 end
 
 class Hangman
+  attr_reader :underscore_word, :user_name, :game
+
   def initialize
   	@game = Game.new
     @user_name = @game.welcome
@@ -83,6 +93,14 @@ class Hangman
     puts "\n\n"
   end
 
+  def save_game
+    Dir.mkdir('games') unless Dir.exist? 'games'
+    filename = 'games/saved.yaml'
+    File.open(filename, 'w') do |file|
+      file.puts YAML.dump(self)
+    end
+  end
+
   def play
     while
       letter = @game.take_letter
@@ -93,13 +111,34 @@ class Hangman
         break
       elsif @underscore_word == "__  :-X ..::GAME OVER::.. X-:  __"
         lost
-        puts "PS The secret word was: #{@game.secret_word}".rjust(100)
+        puts "PS The secret word was: #{@game.secret_word}".rjust(60)
         break
       else
         puts "Misses: #{@game.bad_choices.join(", ").downcase}"
+        puts "Do You want to save a game? (y/n)"
+        save_game if gets.chomp.downcase == 'y'
+        puts "Do You want to break a game? (y/n)"
+        break if gets.chomp.downcase == 'y'
       end
     end
   end
 end
 
-Hangman.new.play
+def load_game
+  content = File.open('games/saved.yaml', 'r') { |file| file.read }
+  YAML.load(content)
+end
+
+puts "Do you want to load previously saved Hangman game (y/n)?"
+
+if gets.chomp.downcase == 'y'
+  game = load_game
+  puts "Welcome back, #{game.user_name}!"
+  puts "It's Your word: #{game.underscore_word}"
+  puts "Misses: #{game.game.bad_choices.join(", ").downcase}"
+  puts "You have lost #{12 - game.game.turns} turns."
+  puts "But You still have #{game.game.turns} more incorrect guesses before the game ends."
+  game.play
+else
+  Hangman.new.play
+end
