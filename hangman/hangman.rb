@@ -2,7 +2,7 @@ require 'yaml'
 
 module Dictionary
   def random_word
-  	dict = []
+    dict = []
     File.open("5desk.txt").readlines.each do |line|
       dict << line.strip if line.strip.length.between?(5, 12)
     end
@@ -29,8 +29,8 @@ class Game
 
   def underscore_word
     a = ""
-  	@secret_word.length.times {a << "_"}
-  	a
+    @secret_word.length.times {a << "_"}
+    a
   end
 
   def answer_to_letter(letter, underscore_word)
@@ -39,11 +39,11 @@ class Game
       new_word = ""
       index = 0
       underscore_word.each_char do |l|
-      	new_word[index] = @secret_word[index] == letter ? letter : l
+        new_word[index] = @secret_word[index] == letter ? letter : l
         index += 1     
       end
       new_word
-    else  	
+    else
       puts "Baaaaad choice!"
       @turns -= 1
       if @turns == 0
@@ -73,13 +73,13 @@ class Hangman
   attr_reader :underscore_word, :user_name, :game
 
   def initialize
-  	@game = Game.new
+    @game = Game.new
     @user_name = @game.welcome
     @underscore_word = @game.underscore_word
   end
 
   def win?
-  	if @underscore_word.include? "_"
+    if @underscore_word.include? "_"
       false
     else
       true
